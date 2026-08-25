@@ -90,6 +90,9 @@ func RebalanceRouter(r *shard.Router, st *store.Store, shards []string) error {
 		return err
 	}
 	r.Rebalance(shards)
+	// 路由表已变更：旧的路由缓存按 hash%N 计算已失效，必须清空，
+	// 否则既有序列仍按旧分片写入，新分片空转。
+	st.Reindex()
 	return nil
 }
 
