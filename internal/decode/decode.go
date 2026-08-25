@@ -18,7 +18,7 @@ type wirePoint struct {
 func Decode(raw []byte) (model.Point, error) {
 	var wp wirePoint
 	if err := json.Unmarshal(raw, &wp); err != nil {
-		return model.Point{}, nil
+		return model.Point{}, err
 	}
 	if wp.Series == "" {
 		return model.Point{}, errors.New("missing series")
