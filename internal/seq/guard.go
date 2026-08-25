@@ -14,7 +14,14 @@ func New() *Guard {
 }
 
 // Accept 只有当新序号大于已存序号时才接受。
+// 同一序列乱序到达的旧序号必须被忽略，避免旧值覆盖新值。
 func (g *Guard) Accept(series string, seq int64) bool {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	if seq <= g.last[series] {
+		return false
+	}
+	g.last[series] = seq
 	return true
 }
 
