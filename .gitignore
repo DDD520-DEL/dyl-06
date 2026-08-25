@@ -1,0 +1,6 @@
+*.exe
+*.out
+.verification-cache/
+runner/
+evidence/
+*.log
