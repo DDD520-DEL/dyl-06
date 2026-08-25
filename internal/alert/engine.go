@@ -53,16 +53,18 @@ func (e *Engine) Evaluate(series string, result model.AggResult) {
 		e.states[rule.Name] = model.RuleState{Status: status, Since: now}
 		e.lastValue[rule.Name] = result.Sum
 		e.mu.Unlock()
+		// 无论告警还是恢复都要推送；恢复(ok)事件若被丢弃，值班端会一直停留在告警中。
+		// 重复状态由 Dispatcher 的 LastStatus 去重，避免每个周期轰炸订阅端。
+		e.notifier.Dispatch(model.Event{
+			Rule:   rule.Name,
+			Series: series,
+			Status: status,
+			Value:  result.Sum,
+		})
 		if status == "alert" {
 			if e.history != nil {
 				e.history.Record(rule.Name, status, result.Sum)
 			}
-			e.notifier.Dispatch(model.Event{
-				Rule:   rule.Name,
-				Series: series,
-				Status: status,
-				Value:  result.Sum,
-			})
 			e.metrics.Alerts.Add(1)
 		}
 	}
