@@ -23,6 +23,8 @@ func NewBucket() *Bucket {
 
 // Merge 把点位合并进桶，线程安全。
 func (b *Bucket) Merge(p model.Point) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
 	b.Count++
 	b.Sum += p.Value
 	if p.Value > b.Max {
