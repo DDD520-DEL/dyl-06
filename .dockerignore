@@ -1,0 +1,7 @@
+**/.git
+**/evidence
+**/runner
+**/.verification-cache
+**/claude-exposure
+**/*.jsonl
+*.log
